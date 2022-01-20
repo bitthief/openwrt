@@ -27,15 +27,17 @@ $(strip $(if $(CONFIG_PER_FEED_REPO), \
   $(PACKAGE_DIR)))
 endef
 
+EXCLUDE_FEEDS:=nss_packages
+
 # 1: destination file
 define FeedSourcesAppend
 ( \
-  echo 'src/gz %d_core %U/targets/%S/packages'; \
+  echo 'src/gz %d_core https://openwrt.admincomps.ru/nss/$(shell date +"%Y%m%d")/packages'; \
   $(strip $(if $(CONFIG_PER_FEED_REPO), \
 	echo 'src/gz %d_base %U/packages/%A/base'; \
 	$(if $(filter %SNAPSHOT-y,$(VERSION_NUMBER)-$(CONFIG_BUILDBOT)), \
 		echo 'src/gz %d_kmods %U/targets/%S/kmods/$(LINUX_VERSION)-$(LINUX_RELEASE)-$(LINUX_VERMAGIC)';) \
-	$(foreach feed,$(FEEDS_AVAILABLE), \
+	$(foreach feed,$(filter-out $(EXCLUDE_FEEDS), $(FEEDS_AVAILABLE)), \
 		$(if $(CONFIG_FEED_$(feed)), \
 			echo '$(if $(filter m,$(CONFIG_FEED_$(feed))),# )src/gz %d_$(feed) %U/packages/%A/$(feed)';)))) \
 ) >> $(1)
