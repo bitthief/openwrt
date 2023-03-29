@@ -1,0 +1,51 @@
+#!/usr/bin/ucode
+/* Copyright (C) 2022 ImmortalWrt.org */
+
+'use strict';
+
+import { connect } from 'ubus';
+
+const ubus = connect();
+const stat = ubus.call('network.device', 'status', {});
+if (!stat) {
+	print('{}');
+	exit(1);
+}
+
+let eth_info = [];
+for (let ifname in stat) {
+	if (!ifname || stat[ifname]?.devtype !== 'ethernet' || !length(stat[ifname]['link-advertising']))
+		continue;
+
+	let status, speed, duplex;
+
+	if (stat[ifname]?.carrier)
+		status = 'yes';
+	else
+		status = 'no';
+
+	if (!stat[ifname]?.carrier || !stat[ifname]?.speed || substr(stat[ifname]?.speed, 0, 1) === '-')
+		speed = '-';
+	else
+		speed = substr(stat[ifname]?.speed, 0, -1) + 'Mb/s';
+
+	if (speed == '-')
+		duplex = '-';
+	else if (substr(stat[ifname]?.speed, -1) === 'F')
+		duplex = 'Full';
+	else
+		duplex = 'Half';
+
+	push(eth_info, {
+		name: ifname,
+		status: status,
+		speed: speed,
+		duplex: duplex,
+	});
+}
+
+sort(eth_info, (a, b) => {
+	return a?.name > b?.name;
+});
+
+print(eth_info);
