@@ -33,8 +33,8 @@ platform_check_image() {
 
 platform_pre_upgrade() {
 	case "$(board_name)" in
-	redmi,ax6|\
-	xiaomi,ax3600|\
+	redmi,ax6-stock|\
+	xiaomi,ax3600-stock|\
 	xiaomi,ax9000)
 		xiaomi_initramfs_prepare
 		;;

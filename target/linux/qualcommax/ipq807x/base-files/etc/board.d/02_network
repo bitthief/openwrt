@@ -33,7 +33,9 @@ ipq807x_setup_interfaces()
 		;;
 	compex,wpq873|\
 	redmi,ax6|\
-	xiaomi,ax3600)
+	redmi,ax6-stock|\
+	xiaomi,ax3600|\
+	xiaomi,ax3600-stock)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
 		;;
 	zyxel,nbg7815)
@@ -45,9 +47,22 @@ ipq807x_setup_interfaces()
 	esac
 }
 
+ipq807x_setup_macs()
+{
+	local board="$1"
+	local lan_mac=""
+	local wan_mac=""
+	local label_mac=""
+
+	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
+	[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
+	[ -n "$label_mac" ] && ucidef_set_label_macaddr "$label_mac"
+}
+
 board_config_update
 board=$(board_name)
 ipq807x_setup_interfaces $board
+ipq807x_setup_macs $board
 board_config_flush
 
 exit 0
